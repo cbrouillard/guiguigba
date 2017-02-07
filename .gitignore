@@ -23,6 +23,8 @@
 # Executables
 *.exe
 *.out
+*.elf
+*.gba
 *.app
 *.i*86
 *.x86_64
