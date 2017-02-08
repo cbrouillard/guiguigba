@@ -2,41 +2,83 @@
 #include <hel2.h>
 #include "gfx/ResourceData.h"
 
+#define TEXT_LAYER 1
+#define SCREEN_LAYER 3
+
 // Prototypes
 void app_init();
 void app_showImgBackground();
+void app_showImgBackground2();
 void app_writeSomeText(char* text);
 
 int main(){
 
   app_init();
-  app_showImgBackground();
+  app_showImgBackground2();
 
-  app_writeSomeText ("coucou guigui");
+  //app_writeSomeText ("coucou guigui");
 
   for (;;) {
 
         hel_PadCapture();
 
-        if (hel_PadQuery()->Pressed.Start ||
-                hel_PadQuery()->Pressed.Select ||
-                hel_PadQuery()->Pressed.A ||
-                hel_PadQuery()->Pressed.B ||
-                hel_PadQuery()->Pressed.Up ||
-                hel_PadQuery()->Pressed.Down ||
-                hel_PadQuery()->Pressed.Right ||
-                hel_PadQuery()->Pressed.Left ||
-                hel_PadQuery()->Pressed.R ||
-                hel_PadQuery()->Pressed.L
-                ) {
-            break;
+        if (hel_PadQuery()->Pressed.Start){}
+        if (hel_PadQuery()->Pressed.Select){}
+        if (hel_PadQuery()->Pressed.A){}
+        if (hel_PadQuery()->Pressed.B){}
+        if (hel_PadQuery()->Pressed.Up){
+          app_writeSomeText ("coucou guigui");
         }
+        if (hel_PadQuery()->Pressed.Down){}
+        if (hel_PadQuery()->Pressed.Right){
+          FAT_reinitScreen();
+          app_showImgBackground();
+          hel_SwiVBlankIntrWait();
+        }
+        if (hel_PadQuery()->Pressed.Left){
+          FAT_reinitScreen();
+          app_showImgBackground2();
+          hel_SwiVBlankIntrWait();
+        }
+        if (hel_PadQuery()->Pressed.R){}
+        if (hel_PadQuery()->Pressed.L){}
+        //break;
 
         // Wait for Vertical Blank
         hel_SwiVBlankIntrWait();
     }
 
   return 0;
+
+}
+
+/**
+ * \brief Méthode qui permet de réinitialiser le BG SCREEN_LAYER proprement.
+ *
+ * <b>NE PAS TOUCHER !  </b>
+ */
+void FAT_reinitScreen() {
+    if (ham_bg[SCREEN_LAYER].ti) {
+        ham_DeInitTileSet(ham_bg[SCREEN_LAYER].ti);
+        ham_DeInitMapSet(ham_bg[SCREEN_LAYER].mi);
+        FAT_forceClearTextLayer();
+    }
+}
+
+/**
+ * \brief Méthode à réfactorer : effacer l'écran texte en affichant des espaces partout.
+ *
+ * Performance warning ! Afficher du texte via HAM est lent !
+ */
+void FAT_forceClearTextLayer() {
+    if (ham_bg[TEXT_LAYER].ti) {
+
+        ham_DeInitTileSet(ham_bg[TEXT_LAYER].ti);
+        ham_DeInitMapSet(ham_bg[TEXT_LAYER].mi);
+
+        ham_bg[TEXT_LAYER].ti = ham_InitTileSet((void*) ResData(RES_TEXT_RAW), RES_TEXT_RAW_SIZE16, 1, 1);
+        ham_bg[TEXT_LAYER].mi = ham_InitMapEmptySet((u8) 1024, 0);
+    }
 
 }
 
@@ -80,7 +122,7 @@ void app_init() {
     hel_SysSetPrefetch(FALSE);
 
     hel_BgSetMode(0);
-    
+
     hel_MapInit(g_MapSystemBuffer);
     hel_BgTextInit((void*) g_BgTextSystemMemory);
     hel_ObjInit(g_ObjSystemBuffer);
@@ -92,7 +134,7 @@ void app_init() {
 
     // initialisation des palettes.
     hel_PalBgLoad256(ResData16(RES_SCREEN_PAL));
-    
+
     // Initialize the tileset and an empty
     ham_bg[TEXT_LAYER].ti = ham_InitTileSet((void*) ResData(RES_TEXT_RAW), RES_TEXT_RAW_SIZE16, 1, 1);
     ham_bg[TEXT_LAYER].mi = ham_InitMapEmptySet((u8) 640, 0);
@@ -128,7 +170,21 @@ void app_showImgBackground() {
 
 }
 
+void app_showImgBackground2() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_IMGBACKGROUND2_RAW), RES_IMGBACKGROUND2_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_IMGBACKGROUND2_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
 
 void app_writeSomeText(char* text) {
-  hel_BgTextPrintF(TEXT_LAYER, 5, 13, 0, text);
+  hel_BgTextPrintF(TEXT_LAYER, 2, 2, 0, text);
 }
