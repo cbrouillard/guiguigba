@@ -7,38 +7,43 @@
 
 // Prototypes
 void app_init();
+void FAT_initSpritePalette();
 void app_showImgBackground();
 void app_showImgBackground2();
 void app_writeSomeText(char* text);
+void hideCursor();
+void showCursor();
+void deplace();
+u8 x=2;
+u8 y=2;
 
 int main(){
 
   app_init();
-  app_showImgBackground2();
+  //app_showImgBackground2();
 
   //app_writeSomeText ("coucou guigui");
 
   for (;;) {
 
         hel_PadCapture();
+        FAT_initCursor1();
 
         if (hel_PadQuery()->Pressed.Start){}
         if (hel_PadQuery()->Pressed.Select){}
         if (hel_PadQuery()->Pressed.A){}
         if (hel_PadQuery()->Pressed.B){}
-        if (hel_PadQuery()->Pressed.Up){
-          app_writeSomeText ("coucou guigui");
-        }
+        if (hel_PadQuery()->Pressed.Up){}
         if (hel_PadQuery()->Pressed.Down){}
         if (hel_PadQuery()->Pressed.Right){
-          FAT_reinitScreen();
-          app_showImgBackground();
-          hel_SwiVBlankIntrWait();
+          x++;
+          y++;
+          FAT_cursors_moveCursor1(x,y);
+          showCursor();
         }
         if (hel_PadQuery()->Pressed.Left){
           FAT_reinitScreen();
-          app_showImgBackground2();
-          hel_SwiVBlankIntrWait();
+          hideCursor();
         }
         if (hel_PadQuery()->Pressed.R){}
         if (hel_PadQuery()->Pressed.L){}
@@ -81,6 +86,48 @@ void FAT_forceClearTextLayer() {
     }
 
 }
+
+/**
+ * \brief La palette pour les sprites est différente: cette fonction la charge au bon endroit.
+ */
+void FAT_initSpritePalette() {
+    hel_PalObjLoad16(ResData16(RES_SPRITES_PAL), 0);
+}
+/**
+ * ID technique HAM pour le cursor de taille 1.
+ */
+THandle FAT_cursor1_obj;
+void FAT_initCursor1() {
+    FAT_cursor1_obj = hel_ObjCreate(ResData(RES_OSC_SAW_RAW), // Pointer to source graphic
+                                                          OBJ_SHAPE_SQUARE,       // Obj Shape
+                                                          1,                      // Obj Size, 1 means 16x16 pixels, if Shape is set to SQUARE
+                                                          OBJ_MODE_SEMITRANSPARENT,        // Obj Mode
+                                                          COLORS_16,              // Use 16 color mode
+                                                          0,                      // Palette number. Only neccessary in 16 color mode
+                                                          FALSE,                  // Don't use mosaic
+                                                          FALSE,                  // Don't flip the sprite horizontally
+                                                          FALSE,                  // Don't flip the object vertically
+                                                          1,                      // Priority against background. 0=higest
+                                                          FALSE,                  // Don't make the object double-sized
+                                                          0,                    // Destination horzintal screen coordinate in pixels
+                                                          0                      // Destination vertical screen coordinate in pixels
+                                                          );
+
+    hel_ObjSetVisible(FAT_cursor1_obj, 0);
+}
+
+void hideCursor() {
+  hel_ObjSetVisible(FAT_cursor1_obj, 0);
+}
+
+void showCursor() {
+  hel_ObjSetVisible(FAT_cursor1_obj, 1);
+}
+
+void FAT_cursors_moveCursor1(u8 x, u8 y) {
+    hel_ObjSetXY(FAT_cursor1_obj, x, y);
+}
+
 
 // Implémentations des prototypes et fonctions utilitaires
 
@@ -134,6 +181,7 @@ void app_init() {
 
     // initialisation des palettes.
     hel_PalBgLoad256(ResData16(RES_SCREEN_PAL));
+    FAT_initSpritePalette();
 
     // Initialize the tileset and an empty
     ham_bg[TEXT_LAYER].ti = ham_InitTileSet((void*) ResData(RES_TEXT_RAW), RES_TEXT_RAW_SIZE16, 1, 1);
