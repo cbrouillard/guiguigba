@@ -34,6 +34,8 @@ u8 jump;
 bool unSurDeux = 0;
 bool jumpBreak = 0;
 u8 xMonstre = 30;
+bool level1complete = 0;
+u8 nbMontres = 0;
 
 int main(){
 
@@ -72,6 +74,7 @@ int main(){
 u8 t;
 u8 temporisation=0;
 
+//Niveau 1
   for (;;) {
 
         hel_PadCapture();
@@ -152,12 +155,48 @@ u8 temporisation=0;
           app_writeSomeText("Collision",2,2);
         }
 
+        //Fin du niveau 1
+        //si on a passé tous les monstres
+        nbMontres=5;
+        if(nbMontres == 5){
+          level1complete = 1;
+          break;
+        }
+
         // Wait for Vertical Blank
         hel_SwiVBlankIntrWait();
     }
 
+  //texte fin de niveau 1
+  FAT_reinitScreen();
+  app_showImgNiveau2FIN();
+  hideALL();
+  for(;;){
+    hel_PadCapture();
+    if (hel_PadQuery()->Pressed.Start){
+      break;
+    }
+  }
+
+  //Niveau 2
+  FAT_reinitScreen();
+  hideALL();
+  //app_showImgNiveau3();
+  app_writeSomeText("niveau 2",2,5);
+  for(;;){
+
+    hel_SwiVBlankIntrWait();
+  }
+
   return 0;
 
+} //fin du main
+
+void hideALL(){
+  hidePerso();
+  hideChamp1();
+  hideTortue();
+  hideMonstre();
 }
 
 //fait sauter le perso
@@ -505,14 +544,14 @@ void app_showImgGameCover() {
 
 }
 
-void app_showImgNiveau1() {
+void app_showImgIntro() {
 
-    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV1_RAW), RES_NIV1_RAW_SIZE16, 1, 1);
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_INTRO_RAW), RES_INTRO_RAW_SIZE16, 1, 1);
     // Create a map for background
     hel_MapCreate(SCREEN_LAYER,        // Background number
                   32,   // width in tiles
                   20,   // height in tiles
-                  ResData(RES_NIV1_MAP),   // Pointer to source MapData
+                  ResData(RES_INTRO_MAP),   // Pointer to source MapData
                   sizeof(u16),                  // DataTypeSize of one element from Source MapData
                   MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
 
@@ -528,6 +567,36 @@ void app_showImgNiveau2() {
                   32,   // width in tiles
                   20,   // height in tiles
                   ResData(RES_NIV2_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
+void app_showImgNiveau2FIN() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV2FIN_RAW), RES_NIV2FIN_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_NIV2FIN_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
+void app_showImgNiveau3() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV3_RAW), RES_NIV3_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_NIV3_MAP),   // Pointer to source MapData
                   sizeof(u16),                  // DataTypeSize of one element from Source MapData
                   MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
 
