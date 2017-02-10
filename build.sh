@@ -1,6 +1,5 @@
 #!/bin/sh
 VERSION="1.0"
-
 echo "### Nettoyage"
 make clean
 find . -name "*.o" -exec rm {} \;
@@ -17,5 +16,5 @@ echo "### Padbin pour execution du GBFS"
 wine padbin.exe 256 GUIGUI_v$VERSION.gba
 
 echo "### Lancement de l'émulateur"
-vba  GUIGUI_v$VERSION.gba
-
+#gvba GUIGUI_v$VERSION.gba
+vba GUIGUI_v$VERSION.gba
