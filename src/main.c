@@ -439,6 +439,39 @@ void moveMonstre(u8 x, u8 y) {
     hel_ObjSetXY(monstre_obj, x, y);
 }
 
+//Gestion de la clé usb
+THandle usbkey_obj;
+void initMonstre() {
+    usbkey_obj = hel_ObjCreate(ResData(RES_USBKEY_RAW), // Pointer to source graphic
+                                                          OBJ_SHAPE_VERTICAL,       // Obj Shape
+                                                          2,                      // Obj Size, 1 means 16x16 pixels, if Shape is set to SQUARE
+                                                          OBJ_MODE_SEMITRANSPARENT,        // Obj Mode
+                                                          COLORS_16,              // Use 16 color mode
+                                                          0,                      // Palette number. Only neccessary in 16 color mode
+                                                          FALSE,                  // Don't use mosaic
+                                                          FALSE,                  // Don't flip the sprite horizontally
+                                                          FALSE,                  // Don't flip the object vertically
+                                                          1,                      // Priority against background. 0=higest
+                                                          FALSE,                  // Don't make the object double-sized
+                                                          100,                    // Destination horzintal screen coordinate in pixels
+                                                          70                      // Destination vertical screen coordinate in pixels
+                                                          );
+
+    hel_ObjSetVisible(usbkey_obj, 0);
+}
+void hideMonstre() {
+  hel_ObjSetVisible(usbkey_obj, 0);
+}
+
+void showMonstre() {
+  hel_ObjSetVisible(usbkey_obj, 1);
+}
+
+void moveMonstre(u8 x, u8 y) {
+    hel_ObjSetXY(usbkey_obj, x, y);
+}
+
+
 
 // Implémentations des prototypes et fonctions utilitaires
 

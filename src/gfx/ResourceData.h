@@ -282,6 +282,15 @@
 #define RES_TORTUE_RAW_SIZE32	64
 #define RES_TORTUE_RAW_SIZE32PADDED	64
 
+// src/gfx/raw/usbkey.raw
+#define RES_USBKEY_RAW	86560
+#define RES_USBKEY_RAW_SIZE	256
+#define RES_USBKEY_RAW_SIZEPADDED	256
+#define RES_USBKEY_RAW_SIZE16	128
+#define RES_USBKEY_RAW_SIZE16PADDED	128
+#define RES_USBKEY_RAW_SIZE32	64
+#define RES_USBKEY_RAW_SIZE32PADDED	64
+
 
 #define ResData(_identifier)	((const void*)&__ResourceData__[_identifier])
 #define ResData8(_identifier)	((const unsigned char*)&__ResourceData__[_identifier])
