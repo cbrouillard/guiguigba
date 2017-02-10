@@ -169,7 +169,7 @@ u8 temporisation=0;
 
   //texte fin de niveau 1
   FAT_reinitScreen();
-  app_showImgNiveau2FIN();
+  app_showImgNiveau1FIN();
   hideALL();
   for(;;){
     hel_PadCapture();
@@ -181,7 +181,7 @@ u8 temporisation=0;
   //Niveau 2
   FAT_reinitScreen();
   hideALL();
-  //app_showImgNiveau3();
+  app_showImgNiveau2();
   app_writeSomeText("niveau 2",2,5);
   for(;;){
 
@@ -559,6 +559,36 @@ void app_showImgIntro() {
 
 }
 
+void app_showImgNiveau1() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV1_RAW), RES_NIV1_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_NIV1_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
+void app_showImgNiveau1FIN() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV1FIN_RAW), RES_NIV1FIN_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_NIV1FIN_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
 void app_showImgNiveau2() {
 
     ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV2_RAW), RES_NIV2_RAW_SIZE16, 1, 1);
@@ -567,36 +597,6 @@ void app_showImgNiveau2() {
                   32,   // width in tiles
                   20,   // height in tiles
                   ResData(RES_NIV2_MAP),   // Pointer to source MapData
-                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
-                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
-
-    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
-
-}
-
-void app_showImgNiveau2FIN() {
-
-    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV2FIN_RAW), RES_NIV2FIN_RAW_SIZE16, 1, 1);
-    // Create a map for background
-    hel_MapCreate(SCREEN_LAYER,        // Background number
-                  32,   // width in tiles
-                  20,   // height in tiles
-                  ResData(RES_NIV2FIN_MAP),   // Pointer to source MapData
-                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
-                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
-
-    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
-
-}
-
-void app_showImgNiveau3() {
-
-    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV3_RAW), RES_NIV3_RAW_SIZE16, 1, 1);
-    // Create a map for background
-    hel_MapCreate(SCREEN_LAYER,        // Background number
-                  32,   // width in tiles
-                  20,   // height in tiles
-                  ResData(RES_NIV3_MAP),   // Pointer to source MapData
                   sizeof(u16),                  // DataTypeSize of one element from Source MapData
                   MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
 
