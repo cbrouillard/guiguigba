@@ -26,6 +26,7 @@ void discoursChampi();
 void app_showImgNiveau1();
 void app_showImgNiveau2();
 
+THandle tabUsbKey[5];
 u8 x=2;
 u8 y=70;
 u8 yPeach;
@@ -36,6 +37,8 @@ bool jumpBreak = 0;
 u8 xMonstre = 30;
 bool level1complete = 0;
 u8 nbMontres = 0;
+u8 xUsbKey = 2;
+u8 yUsbKey = 2;
 
 int main(){
 
@@ -44,6 +47,7 @@ int main(){
   initChamp1();
   initTortue();
   initMonstre();
+  initUsbKey();
   app_showFirstScreen();
   app_showImgGameCover();
 
@@ -168,7 +172,7 @@ u8 temporisation=0;
     }
 
   //texte fin de niveau 1
-  FAT_reinitScreen();
+/*  FAT_reinitScreen();
   app_showImgNiveau1FIN();
   hideALL();
   for(;;){
@@ -177,13 +181,55 @@ u8 temporisation=0;
       break;
     }
   }
-
+*/
   //Niveau 2
   FAT_reinitScreen();
   hideALL();
   app_showImgNiveau2();
   app_writeSomeText("niveau 2",2,5);
+  showUsbKey();
+  showUsbKey1();
+  u8 xUsbKey2 = xUsbKey + 170;
+  u8 yUsbKey2 = yUsbKey;
+  u8 xUsbKey3 = 100;
+  u8 yUsbKey3 = 2;
+  u8 nbCle = 1;
+  int gestionCleUsb[5];
+  gestionCleUsb[0]=1;gestionCleUsb[1]=0;gestionCleUsb[2]=0;gestionCleUsb[3]=0;gestionCleUsb[4]=0;
+
   for(;;){
+    //il pleut des clé usb
+    moveUsbKey(xUsbKey,yUsbKey);
+    moveUsbKey1(xUsbKey+20,yUsbKey-5);
+
+    if(gestionCleUsb[0] == 1){
+      yUsbKey++;
+      if(yUsbKey > 125){
+        yUsbKey = 2;
+        gestionCleUsb[1] = 1;
+        hideUsbKey();
+        hideUsbKey1();
+      }
+    }
+    if(gestionCleUsb[1] == 1){
+      showUsbKey2();
+      yUsbKey2++;
+      moveUsbKey2(xUsbKey2,yUsbKey2);
+      if(yUsbKey2 > 125){
+        yUsbKey2 = 2;
+        gestionCleUsb[2] = 1;
+      }
+    }
+    if(gestionCleUsb[2] == 1){
+      showUsbKey3();
+      yUsbKey3++;
+      moveUsbKey3(xUsbKey3,yUsbKey3);
+      if(yUsbKey3 > 125){
+        yUsbKey3 = 2;
+        gestionCleUsb[3] = 1;
+      }
+    }
+
 
     hel_SwiVBlankIntrWait();
   }
@@ -441,10 +487,10 @@ void moveMonstre(u8 x, u8 y) {
 
 //Gestion de la clé usb
 THandle usbkey_obj;
-void initMonstre() {
+void initUsbKey() {
     usbkey_obj = hel_ObjCreate(ResData(RES_USBKEY_RAW), // Pointer to source graphic
-                                                          OBJ_SHAPE_VERTICAL,       // Obj Shape
-                                                          2,                      // Obj Size, 1 means 16x16 pixels, if Shape is set to SQUARE
+                                                          OBJ_SHAPE_SQUARE,       // Obj Shape
+                                                          1,                      // Obj Size, 1 means 16x16 pixels, if Shape is set to SQUARE
                                                           OBJ_MODE_SEMITRANSPARENT,        // Obj Mode
                                                           COLORS_16,              // Use 16 color mode
                                                           0,                      // Palette number. Only neccessary in 16 color mode
@@ -458,17 +504,53 @@ void initMonstre() {
                                                           );
 
     hel_ObjSetVisible(usbkey_obj, 0);
+    //on clone les cle usb
+    tabUsbKey[0] = hel_ObjClone(usbkey_obj,5,5);
+    tabUsbKey[1] = hel_ObjClone(usbkey_obj,5,5);
+    tabUsbKey[2] = hel_ObjClone(usbkey_obj,5,5);
+    tabUsbKey[3] = hel_ObjClone(usbkey_obj,5,5);
 }
-void hideMonstre() {
+void hideUsbKey() {
   hel_ObjSetVisible(usbkey_obj, 0);
 }
 
-void showMonstre() {
+void showUsbKey() {
   hel_ObjSetVisible(usbkey_obj, 1);
 }
 
-void moveMonstre(u8 x, u8 y) {
+void moveUsbKey(u8 x, u8 y) {
     hel_ObjSetXY(usbkey_obj, x, y);
+}
+
+void hideUsbKey1() {
+  hel_ObjSetVisible(tabUsbKey[0], 0);
+}
+
+void showUsbKey1() {
+  hel_ObjSetVisible(tabUsbKey[0], 1);
+}
+void moveUsbKey1(u8 x, u8 y) {
+    hel_ObjSetXY(tabUsbKey[0], x, y);
+}
+
+void hideUsbKey2() {
+  hel_ObjSetVisible(tabUsbKey[1], 0);
+}
+
+void showUsbKey2() {
+  hel_ObjSetVisible(tabUsbKey[1], 1);
+}
+void moveUsbKey2(u8 x, u8 y) {
+    hel_ObjSetXY(tabUsbKey[1], x, y);
+}
+void hideUsbKey3() {
+  hel_ObjSetVisible(tabUsbKey[2], 0);
+}
+void showUsbKey3() {
+  hel_ObjSetVisible(tabUsbKey[2], 1);
+}
+void moveUsbKey3(u8 x, u8 y) {
+    hel_ObjSetXY(tabUsbKey[2], x, y);
 }
 
 
