@@ -187,30 +187,53 @@ u8 temporisation=0;
   hideALL();
   app_showImgNiveau2();
   app_writeSomeText("niveau 2",2,5);
+  showPerso();
   showUsbKey();
   showUsbKey1();
   u8 xUsbKey2 = xUsbKey + 170;
   u8 yUsbKey2 = yUsbKey;
   u8 xUsbKey3 = 100;
   u8 yUsbKey3 = 2;
+  u8 xUsbKey4 = 80;
+  u8 yUsbKey4 = 2;
+  u8 xUsbKey5 = 60;
+  u8 yUsbKey5 = 2;
+  u8 xUsbKey6 = 140;
+  u8 yUsbKey6 = 2;
   u8 nbCle = 1;
+  u8 cptNiv2 = 0;
   int gestionCleUsb[5];
   gestionCleUsb[0]=1;gestionCleUsb[1]=0;gestionCleUsb[2]=0;gestionCleUsb[3]=0;gestionCleUsb[4]=0;
-
+  xPeach = 2;
+  yPeach = SOLPEACH;
+/*
   for(;;){
+    hel_PadCapture();
+    if (hel_PadQuery()->Pressed.Right){
+      xPeach += 5;
+      movePeach(xPeach,yPeach);
+    }
+    if (hel_PadQuery()->Pressed.Left){
+      xPeach -= 5;
+      movePeach(xPeach,yPeach);
+    }
     //il pleut des clé usb
     moveUsbKey(xUsbKey,yUsbKey);
     moveUsbKey1(xUsbKey+20,yUsbKey-5);
 
+    //premier jeu de 2 clés
     if(gestionCleUsb[0] == 1){
       yUsbKey++;
       if(yUsbKey > 125){
         yUsbKey = 2;
         gestionCleUsb[1] = 1;
+        gestionCleUsb[0] = 0;
         hideUsbKey();
         hideUsbKey1();
       }
     }
+
+    //seconde clé
     if(gestionCleUsb[1] == 1){
       showUsbKey2();
       yUsbKey2++;
@@ -220,6 +243,8 @@ u8 temporisation=0;
         gestionCleUsb[2] = 1;
       }
     }
+
+    //Troisème clé
     if(gestionCleUsb[2] == 1){
       showUsbKey3();
       yUsbKey3++;
@@ -230,9 +255,91 @@ u8 temporisation=0;
       }
     }
 
+    //quatrième clé
+    if(gestionCleUsb[3] == 1){
+      showUsbKey4();
+      yUsbKey4++;
+      moveUsbKey4(xUsbKey4,yUsbKey4-10);
+      if(yUsbKey4 > 125){
+        yUsbKey4 = 2;
+        gestionCleUsb[4] = 1;
+
+        //on relance les 2 première clés
+        yUsbKey = 2;
+        showUsbKey();
+        showUsbKey1();
+        gestionCleUsb[0] = 1;
+      }
+    }
+
+    //cinquième clé
+    if(gestionCleUsb[4] == 1){
+      showUsbKey5();
+      yUsbKey5++;
+      moveUsbKey5(xUsbKey5,yUsbKey5+5);
+      if(yUsbKey5 > 125){
+        yUsbKey5 = 2;
+        gestionCleUsb[5] = 1;
+      }
+    }
+
+    //dernière clé
+    if(gestionCleUsb[5] == 1){
+      showUsbKey6();
+      yUsbKey6++;
+      moveUsbKey6(xUsbKey6,yUsbKey6-15);
+      if(yUsbKey6 > 125){
+        yUsbKey6 = 2;
+        cptNiv2++;
+      }
+      if(cptNiv2 == 2){
+        break;
+      }
+    }
+
+    //Test collision peach et monstre -> blink de peach
+    //if(xPeach+16 >= xMonstre && temporisation < 30){
+    if( xUsbKey < xPeach && xPeach < xUsbKey + 11 && yPeach <= yUsbKey + 10 ||
+        xUsbKey2 < xPeach && xPeach < xUsbKey2 + 11 && yPeach <= yUsbKey2 + 10 ||
+        xUsbKey3 < xPeach && xPeach < xUsbKey3 + 11 && yPeach <= yUsbKey3 + 10 ||
+        xUsbKey4 < xPeach && xPeach < xUsbKey4 + 11 && yPeach <= yUsbKey4 + 10 ||
+        xUsbKey5 < xPeach && xPeach < xUsbKey5 + 11 && yPeach <= yUsbKey5 + 10 ||
+        xUsbKey6 < xPeach && xPeach < xUsbKey6 + 11 && yPeach <= yUsbKey6 + 10
+      ){
+      //clignote peach et monstre
+      hidePerso();
+      hel_SwiVBlankIntrWait();
+      showPerso();
+    }
+
 
     hel_SwiVBlankIntrWait();
+  }//fin niveau 2
+*/
+  //final du jeu
+  FAT_reinitScreen();
+  hideALL();
+  app_showImgNiveauFinal();
+  xPeach = 2;
+  yPeach = SOLPEACH;
+  showPerso();
+  for(;;){
+    hel_PadCapture();
+    if (hel_PadQuery()->Pressed.Right){
+      xPeach += 5;
+      movePeach(xPeach,yPeach);
+    }
+    if(xPeach >= 195){
+      break;
+    }
+    hel_SwiVBlankIntrWait();
   }
+
+  //fin
+  FAT_reinitScreen();
+  hideALL();
+  app_showImgTexteFinal();
+  for(;;){}
 
   return 0;
 
@@ -243,6 +350,13 @@ void hideALL(){
   hideChamp1();
   hideTortue();
   hideMonstre();
+  hideUsbKey();
+  hideUsbKey1();
+  hideUsbKey2();
+  hideUsbKey3();
+  hideUsbKey4();
+  hideUsbKey5();
+  hideUsbKey6();
 }
 
 //fait sauter le perso
@@ -509,6 +623,9 @@ void initUsbKey() {
     tabUsbKey[1] = hel_ObjClone(usbkey_obj,5,5);
     tabUsbKey[2] = hel_ObjClone(usbkey_obj,5,5);
     tabUsbKey[3] = hel_ObjClone(usbkey_obj,5,5);
+    tabUsbKey[4] = hel_ObjClone(usbkey_obj,5,5);
+    tabUsbKey[5] = hel_ObjClone(usbkey_obj,5,5);
+
 }
 void hideUsbKey() {
   hel_ObjSetVisible(usbkey_obj, 0);
@@ -552,7 +669,33 @@ void showUsbKey3() {
 void moveUsbKey3(u8 x, u8 y) {
     hel_ObjSetXY(tabUsbKey[2], x, y);
 }
-
+void hideUsbKey4() {
+  hel_ObjSetVisible(tabUsbKey[3], 0);
+}
+void showUsbKey4() {
+  hel_ObjSetVisible(tabUsbKey[3], 1);
+}
+void moveUsbKey4(u8 x, u8 y) {
+    hel_ObjSetXY(tabUsbKey[3], x, y);
+}
+void hideUsbKey5() {
+  hel_ObjSetVisible(tabUsbKey[4], 0);
+}
+void showUsbKey5() {
+  hel_ObjSetVisible(tabUsbKey[4], 1);
+}
+void moveUsbKey5(u8 x, u8 y) {
+    hel_ObjSetXY(tabUsbKey[4], x, y);
+}
+void hideUsbKey6() {
+  hel_ObjSetVisible(tabUsbKey[5], 0);
+}
+void showUsbKey6() {
+  hel_ObjSetVisible(tabUsbKey[5], 1);
+}
+void moveUsbKey6(u8 x, u8 y) {
+    hel_ObjSetXY(tabUsbKey[5], x, y);
+}
 
 
 // Implémentations des prototypes et fonctions utilitaires
@@ -712,6 +855,36 @@ void app_showImgNiveau2() {
                   32,   // width in tiles
                   20,   // height in tiles
                   ResData(RES_NIV2_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
+void app_showImgNiveauFinal() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIVFINAL_RAW), RES_NIVFINAL_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_NIVFINAL_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
+void app_showImgTexteFinal() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_TEXTEFINAL_RAW), RES_TEXTEFINAL_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_TEXTEFINAL_MAP),   // Pointer to source MapData
                   sizeof(u16),                  // DataTypeSize of one element from Source MapData
                   MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
 
