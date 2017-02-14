@@ -1,4 +1,3 @@
-
 #include <hel2.h>
 #include "gfx/ResourceData.h"
 
@@ -25,8 +24,11 @@ void animePersonage();
 void discoursChampi();
 void app_showImgNiveau1();
 void app_showImgNiveau2();
+void app_showImgIntroChampi();
 
 THandle tabUsbKey[5];
+THandle tabMonstre[5];
+THandle tabTortue[5];
 u8 x=2;
 u8 y=70;
 u8 yPeach;
@@ -36,84 +38,119 @@ bool unSurDeux = 0;
 bool jumpBreak = 0;
 u8 xMonstre = 30;
 bool level1complete = 0;
-u8 nbMontres = 0;
+u8 nbMonstres = 0;
 u8 xUsbKey = 2;
 u8 yUsbKey = 2;
 
 int main(){
-
   app_init();
   initPeach();
   initChamp1();
   initTortue();
   initMonstre();
   initUsbKey();
-  app_showFirstScreen();
+
+  //Couverture du jeu
   app_showImgGameCover();
+  app_writeSomeText("Princesse Morgane",6,2);
+  app_writeSomeText("au pays des geeks !",5,5);
+  app_writeSomeText("[PRESS START]",8,13);
+  animePersonage();//Cette fonction fait la boucle sur la gestion clavier.
 
-//jump
-  //app_showImgNiveau1();
-  //discoursChampi();
-  app_showImgNiveau2();
+  //Screen avec le champi et discours
+  FAT_reinitScreen();
+  app_showImgIntroChampi();
+  showPerso();
+  movePeach(XPEACH,SOLPEACH);
+  yPeach = SOLPEACH;
+  xPeach = XPEACH;
+  bool textOK = 0;
+  for(;;){
+    hel_PadCapture();
+    if (hel_PadQuery()->Pressed.Right){
+      xPeach++;
+      if(xPeach>=175) {
+        //discoursChampi();
+        app_writeSomeText("Bonjour Morgane, je suis ",2,4);
+        app_writeSomeText("un gentil petit champi",2,5);
+        app_writeSomeText("et je vais te raconter",2,6);
+        app_writeSomeText("une histoire.",2,7);
+        app_writeSomeText("Tu viens d'etre catapulte",2,8);
+        app_writeSomeText("dans un mode magique...",2,9);
+        app_writeSomeText("Le monde des geeks !",2,10);
+        app_writeSomeText("Ta mission si tu l'acceptes",2,11);
+        app_writeSomeText("est d'aller delivrer ton",2,12);
+        app_writeSomeText("geek d'amour :)",2,13);
+        app_writeSomeText("[PRESS A]",5,16);
 
-  //peach
+        for(;;) {
+          hel_PadCapture();
+          if (hel_PadQuery()->Pressed.A || hel_PadQuery()->Pressed.B) {
+              break;
+          }
+          hel_SwiVBlankIntrWait();
+        }
+        FAT_reinitScreen();
+        app_writeSomeText("Il est actuellement",1,4);
+        app_writeSomeText("prisonnier dans une boucle",2,5);
+        app_writeSomeText("infinie.",2,6);
+        app_writeSomeText("Pour cela tu devras eviter",2,7);
+        app_writeSomeText("des petits monstres et",2,8);
+        app_writeSomeText("les pluies de clefs usb.",2,9);
+        app_writeSomeText("Appuie sur START pour ",2,14);
+        app_writeSomeText("demarrer ta quete!",2,15);
+        textOK = 1;
+      }else {
+        xPeach+=4;
+        movePeach(xPeach,yPeach);
+      }
+    }
+    if (hel_PadQuery()->Pressed.Start){
+      break;
+    }
+    hel_SwiVBlankIntrWait();
+  }
+
+  //Niveau 1 : il faut éviter les monstres
+  FAT_reinitScreen();
+  app_showImgNiveau1();
+
+  //peach au sol
   showPerso();
   movePeach(XPEACH,SOLPEACH);
   yPeach = SOLPEACH;
   xPeach = XPEACH;
 
-  //champ1
-  showChamp1();
-  moveChamp1(100,SOL);
-
   //tortue
-  showTortue();
-  moveTortue(150,SOLTORTUE);
+  u8 xTortue = MAXDROITE;
+  u8 xTortue1 = MAXDROITE;
+  u8 xTortueBis = MAXDROITE;
+  u8 xTortueVole = MAXDROITE;
 
   //monstre
-  showMonstre();
-  moveMonstre(xMonstre,SOLMONSTRE);
   xMonstre = MAXDROITE;
+  u8 xMonstre3 = MAXDROITE;
+  u8 xMonstre1 = MAXDROITE;
+  u8 xMonstre2 = MAXDROITE;
+  bool declencheM1 = 0;
+  bool declencheM0 = 0;
+  bool declencheM2 = 0;
+  bool declencheT1 = 0;
+  bool declencheT0 = 1;
+  bool dTortue = 0;
 
-u8 t;
-u8 temporisation=0;
-
-//Niveau 1
   for (;;) {
-
         hel_PadCapture();
-
-        if (hel_PadQuery()->Pressed.Start){
-          FAT_reinitScreen();
-          app_writeSomeText("start",2,2);
-        }
-        if (hel_PadQuery()->Pressed.Select){
-          FAT_reinitScreen();
-          app_writeSomeText("Select",2,6);
-        }
-        if (hel_PadQuery()->Pressed.A){
-          //FAT_reinitScreen();
-          //app_writeSomeText("A",2,8);
+        if (hel_PadQuery()->Pressed.A || hel_PadQuery()->Pressed.B){
           jump = 1;
           if(jumpBreak == 0){
             jumpPeach();
             jumpBreak = 1;
           }
-
         }
-        if (hel_PadQuery()->Pressed.B){
-          FAT_reinitScreen();
-          app_writeSomeText("B",2,8);
-        }
-        if (hel_PadQuery()->Pressed.Up){}
-        if (hel_PadQuery()->Pressed.Down){}
         if (hel_PadQuery()->Pressed.Right){
-          if(xPeach>=175) {
-            //discoursChampi();
-          }else {
             xPeach+=4;
             movePeach(xPeach,yPeach);
-          }
           //jump peach
           if (jump == 1){
             if(jumpBreak == 0){
@@ -123,18 +160,116 @@ u8 temporisation=0;
           }
         }
         if (hel_PadQuery()->Pressed.Left){
-          //FAT_reinitScreen();
           if(xPeach > 2){
             xPeach-=4;
             movePeach(xPeach,yPeach);
           }
         }
-        if (hel_PadQuery()->Pressed.R){}
-        if (hel_PadQuery()->Pressed.L){}
 
         //Avance monstre
-        moveMonstre(xMonstre,SOLMONSTRE);
-        xMonstre--;
+        if(nbMonstres == 0 || nbMonstres == 2 || nbMonstres == 4){
+          showMonstre();
+          moveMonstre(xMonstre,SOLMONSTRE);
+          xMonstre--;
+          if(xMonstre == 0){
+            nbMonstres++;
+            hideMonstre();
+          }
+        }
+
+        //Avance tortue
+        if(nbMonstres == 1){//1
+          showTortue();
+          moveTortue(xTortue,SOLTORTUE);
+          xTortue--;
+          if(xTortue == 0){
+            nbMonstres++;
+            hideTortue();
+          }
+        }
+
+        //Monstre et Tortue
+        if(nbMonstres == 3){//3
+          showMonstre();
+          moveMonstre(xMonstre,SOLMONSTRE);
+          xMonstre--;
+          if(xMonstre <= 120){
+            dTortue = 1;
+            showTortue();
+          }
+          if(dTortue == 1){
+            moveTortue(MAXDROITE,SOLTORTUE);
+            moveTortue(xTortueBis,SOLTORTUE);
+            xTortueBis--;
+          }
+          if(xMonstre == 0){
+            hideMonstre();
+          }
+          if(xTortueBis == 0){
+            hideTortue();
+            nbMonstres++;
+          }
+        }
+
+        //Tortue volante
+        if(nbMonstres == 5){
+          if(declencheT0 == 1){
+            showTortue();
+            moveTortue(xTortueVole,SOLTORTUE - 35);
+            xTortueVole--;
+          }
+          if(xTortueVole <= 90){
+            declencheM1 = 1;
+          }
+          if(xTortueVole == 0){
+            hideTortue();
+            showTortue1();
+            declencheT1 = 1;
+            declencheT0 = 0;
+          }
+          if(declencheT1 == 1){
+            moveTortue1(xTortue1,SOLTORTUE);
+            xTortue1--;
+          }
+          if(xTortue1 == 0){//stop la T1
+            declencheT1 = 0;
+          }
+          if(declencheM1 == 1){
+            showMonstre1();
+            moveMonstre1(xMonstre1,SOLMONSTRE);
+            xMonstre1--;
+          }
+          if(xMonstre1 == 0){//stop monstre 1
+            declencheM1 = 0;
+          }
+          if(xMonstre1 <= 30){
+            declencheM0 = 1;
+          }
+          if(declencheM0 == 1){
+            showMonstre();
+            moveMonstre(xMonstre3,SOLMONSTRE);
+            xMonstre3--;
+          }
+          if(xMonstre3 == 0){
+            declencheM0 = 0;
+          }
+          if(xMonstre3 <= 90){
+            declencheM2 = 1;
+          }
+          if(declencheM2 == 1){
+            showMonstre2();
+            moveMonstre2(xMonstre2,SOLMONSTRE);
+            xMonstre2--;
+          }
+          if(xMonstre2 == 2){//stop tout
+            hideMonstre1();
+            hideMonstre2();
+            hideMonstre();
+            hideTortue();
+            hideTortue1();
+            break;
+          }
+        }
 
         //Fait redescendre peach
         if(yPeach < SOLPEACH){
@@ -150,29 +285,22 @@ u8 temporisation=0;
         }
 
         //Test collision peach et monstre -> blink de peach
-        if(xPeach+16 >= xMonstre && temporisation < 30){
-          //clignote peach et monstre
+        if( xPeach+16 >= xMonstre && (xPeach - xMonstre) < 10 && yPeach >= SOLMONSTRE - 16 ||
+            xPeach+16 >= xMonstre2 && (xPeach - xMonstre2) < 10 && yPeach >= SOLMONSTRE - 16 ||
+            xPeach+16 >= xMonstre1 && (xPeach - xMonstre1) < 10 && yPeach >= SOLMONSTRE - 16 ||
+            xPeach+16 >= xTortue1 && (xPeach - xTortue1) < 10 && yPeach >= SOLMONSTRE - 16){
+          //clignote peach
           hidePerso();
           hel_SwiVBlankIntrWait();
           showPerso();
-          temporisation++;
-          app_writeSomeText("Collision",2,2);
-        }
-
-        //Fin du niveau 1
-        //si on a passé tous les monstres
-        nbMontres=5;
-        if(nbMontres == 5){
-          level1complete = 1;
-          break;
         }
 
         // Wait for Vertical Blank
         hel_SwiVBlankIntrWait();
     }
 
-  //texte fin de niveau 1
-/*  FAT_reinitScreen();
+  //Texte fin de niveau 1
+  FAT_reinitScreen();
   app_showImgNiveau1FIN();
   hideALL();
   for(;;){
@@ -181,12 +309,11 @@ u8 temporisation=0;
       break;
     }
   }
-*/
+
   //Niveau 2
   FAT_reinitScreen();
   hideALL();
   app_showImgNiveau2();
-  app_writeSomeText("niveau 2",2,5);
   showPerso();
   showUsbKey();
   showUsbKey1();
@@ -206,7 +333,8 @@ u8 temporisation=0;
   gestionCleUsb[0]=1;gestionCleUsb[1]=0;gestionCleUsb[2]=0;gestionCleUsb[3]=0;gestionCleUsb[4]=0;
   xPeach = 2;
   yPeach = SOLPEACH;
-/*
+  movePeach(xPeach,yPeach);
+
   for(;;){
     hel_PadCapture();
     if (hel_PadQuery()->Pressed.Right){
@@ -306,7 +434,7 @@ u8 temporisation=0;
         xUsbKey5 < xPeach && xPeach < xUsbKey5 + 11 && yPeach <= yUsbKey5 + 10 ||
         xUsbKey6 < xPeach && xPeach < xUsbKey6 + 11 && yPeach <= yUsbKey6 + 10
       ){
-      //clignote peach et monstre
+      //clignote peach
       hidePerso();
       hel_SwiVBlankIntrWait();
       showPerso();
@@ -315,7 +443,20 @@ u8 temporisation=0;
 
     hel_SwiVBlankIntrWait();
   }//fin niveau 2
-*/
+
+  //Texte indiquant que le niveau est validé
+  FAT_reinitScreen();
+  hideALL();
+  app_showImgNiveau2Valide();
+  for(;;){
+    hel_PadCapture();
+    if (hel_PadQuery()->Pressed.Start){
+      break;
+    }
+    hel_SwiVBlankIntrWait();
+  }
+
+
   //final du jeu
   FAT_reinitScreen();
   hideALL();
@@ -323,6 +464,7 @@ u8 temporisation=0;
   xPeach = 2;
   yPeach = SOLPEACH;
   showPerso();
+  movePeach(xPeach,yPeach);
   for(;;){
     hel_PadCapture();
     if (hel_PadQuery()->Pressed.Right){
@@ -357,6 +499,8 @@ void hideALL(){
   hideUsbKey4();
   hideUsbKey5();
   hideUsbKey6();
+  hideMonstre1();
+  hideMonstre2();
 }
 
 //fait sauter le perso
@@ -377,22 +521,21 @@ void discoursChampi(){
     app_writeSomeText("Ta mission si tu l'acceptes",2,11);
     app_writeSomeText("est d'aller delivrer ton",2,12);
     app_writeSomeText("geek d'amour :)",2,13);
-    app_writeSomeText("[PRESS START]",5,16);
+    app_writeSomeText("[PRESS A]",5,16);
 
     for(;;) {
       hel_PadCapture();
-            if (hel_PadQuery()->Pressed.Start ||
-                    hel_PadQuery()->Pressed.Select || hel_PadQuery()->Pressed.A ||  hel_PadQuery()->Pressed.B ||  hel_PadQuery()->Pressed.Up ||  hel_PadQuery()->Pressed.Down ||
-                    hel_PadQuery()->Pressed.Right ||  hel_PadQuery()->Pressed.Left ||  hel_PadQuery()->Pressed.R ||  hel_PadQuery()->Pressed.L) {
+            if (hel_PadQuery()->Pressed.A || hel_PadQuery()->Pressed.B) {
                 break;
             }
             hel_SwiVBlankIntrWait();
     }
     FAT_reinitScreen();
-    app_writeSomeText("Il est actuellement prisonier",1,4);
-    app_writeSomeText("dans une boucle infinie.",2,5);
-    app_writeSomeText("Pour cela tu dervas eviter",2,7);
-    app_writeSomeText("des pti monstres et",2,8);
+    app_writeSomeText("Il est actuellement",1,4);
+    app_writeSomeText("prisonnier dans une boucle",2,5);
+    app_writeSomeText("infinie.",2,6);
+    app_writeSomeText("Pour cela tu devras eviter",2,7);
+    app_writeSomeText("des petits monstres et",2,8);
     app_writeSomeText("les pluies de clefs usb.",2,9);
     app_writeSomeText("Appuie sur START pour ",2,14);
     app_writeSomeText("demarrer ta quete!",2,15);
@@ -400,20 +543,10 @@ void discoursChampi(){
 
 void animePersonage(){
   u8 x=100;
-  u8 y=70;
+  u8 y=60;
   for(;;) {
     hel_PadCapture();
-          if (hel_PadQuery()->Pressed.Start ||
-                  hel_PadQuery()->Pressed.Select ||
-                  hel_PadQuery()->Pressed.A ||
-                  hel_PadQuery()->Pressed.B ||
-                  hel_PadQuery()->Pressed.Up ||
-                  hel_PadQuery()->Pressed.Down ||
-                  hel_PadQuery()->Pressed.Right ||
-                  hel_PadQuery()->Pressed.Left ||
-                  hel_PadQuery()->Pressed.R ||
-                  hel_PadQuery()->Pressed.L
-                  ) {
+          if (hel_PadQuery()->Pressed.Start) {
               break;
           }
     x++;
@@ -426,9 +559,9 @@ void animePersonage(){
   }
 }
 
-void app_showFirstScreen() {
+//void app_showFirstScreen() {
 
-}
+//}
 
 /**
  * \brief Méthode qui permet de réinitialiser le BG SCREEN_LAYER proprement.
@@ -554,6 +687,8 @@ void initTortue() {
                                                           );
 
     hel_ObjSetVisible(tortue_obj, 0);
+    //on clone la tortue
+    tabTortue[0] = hel_ObjClone(tortue_obj,5,5);
 }
 void hideTortue() {
   hel_ObjSetVisible(tortue_obj, 0);
@@ -565,6 +700,17 @@ void showTortue() {
 
 void moveTortue(u8 x, u8 y) {
     hel_ObjSetXY(tortue_obj, x, y);
+}
+void hideTortue1() {
+  hel_ObjSetVisible(tabTortue[0], 0);
+}
+
+void showTortue1() {
+  hel_ObjSetVisible(tabTortue[0], 1);
+}
+
+void moveTortue1(u8 x, u8 y) {
+    hel_ObjSetXY(tabTortue[0], x, y);
 }
 
 //Gestion du monstre
@@ -586,6 +732,9 @@ void initMonstre() {
                                                           );
 
     hel_ObjSetVisible(monstre_obj, 0);
+    //on clone le monstre
+    tabMonstre[0] = hel_ObjClone(monstre_obj,5,5);
+    tabMonstre[1] = hel_ObjClone(monstre_obj,5,5);
 }
 void hideMonstre() {
   hel_ObjSetVisible(monstre_obj, 0);
@@ -597,6 +746,28 @@ void showMonstre() {
 
 void moveMonstre(u8 x, u8 y) {
     hel_ObjSetXY(monstre_obj, x, y);
+}
+void hideMonstre1() {
+  hel_ObjSetVisible(tabMonstre[0], 0);
+}
+
+void showMonstre1() {
+  hel_ObjSetVisible(tabMonstre[0], 1);
+}
+
+void moveMonstre1(u8 x, u8 y) {
+    hel_ObjSetXY(tabMonstre[0], x, y);
+}
+void hideMonstre2() {
+  hel_ObjSetVisible(tabMonstre[1], 0);
+}
+
+void showMonstre2() {
+  hel_ObjSetVisible(tabMonstre[1], 1);
+}
+
+void moveMonstre2(u8 x, u8 y) {
+    hel_ObjSetXY(tabMonstre[1], x, y);
 }
 
 //Gestion de la clé usb
@@ -802,7 +973,7 @@ void app_showImgGameCover() {
 
 }
 
-void app_showImgIntro() {
+void app_showImgIntroChampi() {
 
     ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_INTRO_RAW), RES_INTRO_RAW_SIZE16, 1, 1);
     // Create a map for background
@@ -870,6 +1041,21 @@ void app_showImgNiveauFinal() {
                   32,   // width in tiles
                   20,   // height in tiles
                   ResData(RES_NIVFINAL_MAP),   // Pointer to source MapData
+                  sizeof(u16),                  // DataTypeSize of one element from Source MapData
+                  MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
+
+    ham_InitBg(SCREEN_LAYER, 1, 3, FALSE);
+
+}
+
+void app_showImgNiveau2Valide() {
+
+    ham_bg[SCREEN_LAYER].ti = ham_InitTileSet((void*)ResData(RES_NIV2FIN_RAW), RES_NIV2FIN_RAW_SIZE16, 1, 1);
+    // Create a map for background
+    hel_MapCreate(SCREEN_LAYER,        // Background number
+                  32,   // width in tiles
+                  20,   // height in tiles
+                  ResData(RES_NIV2FIN_MAP),   // Pointer to source MapData
                   sizeof(u16),                  // DataTypeSize of one element from Source MapData
                   MAP_FLAGS_DEFAULT);           // Flags to control map behaviour
 
